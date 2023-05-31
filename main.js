@@ -1,4 +1,5 @@
 const express = require("express");
+const puppeteer = require("puppeteer");
 const axios = require("axios");
 var fs = require("fs");
 const app = express();
@@ -27,9 +28,130 @@ async function getImageObjectFromUrl(apiUrl) {
 let baseUrl =
   "https://3jmnwr0xu4.execute-api.ap-south-1.amazonaws.com/prod/api";
 
-const title = "taj";
-const type = "activity";
-// const type = "stay";
+const title = "taj hotel";
+// const type = "activity";
+const type = "stay";
+
+async function scrapeHotelDetails(title) {
+  // console.log("inside scrapeDetails fn");
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: ["--no-sandbox"],
+  });
+  const page = await browser.newPage();
+  let Data = [];
+  const hotelName = title;
+  const searchQuery = `https://www.google.com/maps/search/${encodeURIComponent(
+    hotelName
+  )}`;
+  await page.goto(searchQuery);
+  try {
+    await page.waitForSelector(".hfpxzc");
+    await page.click(".hfpxzc", { delay: 100 });
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1"
+    );
+    const Name = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
+      (element) => element.textContent.trim()
+    );
+    Data.push(Name);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+    const address = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(address);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+    const phoneNumber = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(phoneNumber);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
+    );
+    await page.click(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
+      { delay: 100 }
+    );
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
+    );
+    const facilities = await page.$$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
+      (elements) => {
+        return elements.map((element) => element.innerText);
+      }
+    );
+
+    Data.push("Amenities:", facilities);
+    console.log(Data);
+  } catch (error) {
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1"
+    );
+    const Name = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
+      (element) => element.textContent.trim()
+    );
+    Data.push(Name);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+    const address = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(address);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+    const phoneNumber = await page.$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(phoneNumber);
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
+    );
+    await page.click(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
+      { delay: 100 }
+    );
+
+    await page.waitForSelector(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
+    );
+    const facilities = await page.$$eval(
+      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
+      (elements) => {
+        return elements.map((element) => element.innerText);
+      }
+    );
+
+    Data.push("Amenities:", facilities);
+    console.log(Data);
+    return Data;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+  return Data;
+}
 
 async function stayFunc(title) {
   console.log("Inside stay func", title);
@@ -60,12 +182,21 @@ async function stayFunc(title) {
     ...stayObj,
     stayImages: arr,
   };
-  //   console.log("now", stayObj);
-  /* GOOGLE MAPS
-  let googleMapURL = `http://localhost:6001/${title}`;
-  let mapdata = await axios.get(googleMapURL);
-  console.log(mapdata.data);
-  */
+
+  console.log("stayObj B4 google maps", stayObj);
+  /* GOOGLE MAPS*/
+
+  let mapdata = await scrapeHotelDetails(title);
+  // console.log(mapdata);
+  const promise1 = Promise.resolve(mapdata);
+  promise1.then((value) => {
+    console.log(value, "yash");
+    stayObj = {
+      ...stayObj,
+      hotelDetails: value,
+    };
+  });
+  console.log("final", stayObj);
   return stayObj;
 }
 
@@ -77,27 +208,12 @@ async function activityFunc(title) {
     activity_name: title,
   };
   // console.log("now", actObj);
-  let googleImgURL = `http://localhost:5000/flyzy-web/us-central1/scrape/image/?search_text=${title}&results_length=${1}`;
+  let googleImgURL = `http://localhost:5000/flyzy-web/us-central1/scrape/image/?search_text=${title}&results_length=${5}`;
   let response = await axios.get(googleImgURL);
 
   let photos = response.data.data;
 
   console.log(photos);
-  /*
-  let imgArr = [];
-  photos.map((ele) => {
-    console.log(ele, typeof ele);
-    let curr = getImageObjectFromUrl(ele);
-    console.log(curr, "yashi");
-    const promise1 = Promise.resolve(curr);
-    console.log(curr, "yashi");
-    promise1.then((value) => {
-      console.log(value, "yash");
-      imgArr.push(value);
-    });
-  });
-  console.log(imgArr);
-*/
   actObj = { ...actObj, activityImages: photos };
   // console.log("now", actObj);
   return actObj;
