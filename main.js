@@ -33,13 +33,12 @@ const title = "taj hotel";
 const type = "stay";
 
 async function scrapeHotelDetails(title) {
-  // console.log("inside scrapeDetails fn");
   const browser = await puppeteer.launch({
     headless: false,
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
-  let Data = [];
+  const Data = [];
   const hotelName = title;
   const searchQuery = `https://www.google.com/maps/search/${encodeURIComponent(
     hotelName
@@ -47,48 +46,97 @@ async function scrapeHotelDetails(title) {
   await page.goto(searchQuery);
   try {
     await page.waitForSelector(".hfpxzc");
-    await page.click(".hfpxzc", { delay: 100 });
+    await page.click(".hfpxzc");
 
-    await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1"
-    );
+    await page.waitForSelector("div.TIHn2 div div.lMbq3e div:nth-child(1) h1");
     const Name = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
+      "div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
       (element) => element.textContent.trim()
     );
     Data.push(Name);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+      "div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
     );
     const address = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      "div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
       (element) => element.textContent.trim()
     );
     Data.push(address);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+      "div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
     );
     const phoneNumber = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      "div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
       (element) => element.textContent.trim()
     );
     Data.push(phoneNumber);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
     );
     await page.click(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
       { delay: 100 }
     );
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
     );
     const facilities = await page.$$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
+      (elements) => {
+        return elements.map((element) => element.innerText);
+      }
+    );
+
+    Data.push(facilities);
+    console.log(Data);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+   
+    await page.waitForSelector("div.TIHn2 div div.lMbq3e div:nth-child(1) h1");
+    const Name = await page.$eval(
+      "div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
+      (element) => element.textContent.trim()
+    );
+    Data.push(Name);
+
+    await page.waitForSelector(
+      "div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+
+    const address = await page.$eval(
+      "div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(address);
+
+    await page.waitForSelector(
+      "div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+    );
+    const phoneNumber = await page.$eval(
+      "div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      (element) => element.textContent.trim()
+    );
+    Data.push(phoneNumber);
+
+    await page.waitForSelector(
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
+    );
+    await page.click(
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
+      { delay: 100 }
+    );
+
+    await page.waitForSelector(
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
+    );
+    const facilities = await page.$$eval(
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
       (elements) => {
         return elements.map((element) => element.innerText);
       }
@@ -97,46 +145,47 @@ async function scrapeHotelDetails(title) {
     Data.push("Amenities:", facilities);
     console.log(Data);
   } catch (error) {
-    await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1"
-    );
+    console.log(error);
+  }
+  try {
+    await page.waitForSelector("div.TIHn2 div div.lMbq3e div:nth-child(1) h1");
     const Name = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
+      "div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
       (element) => element.textContent.trim()
     );
     Data.push(Name);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+      "div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium"
     );
     const address = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      "div:nth-child(11) div:nth-child(3) button div div.rogA2c div.Io6YTe.fontBodyMedium",
       (element) => element.textContent.trim()
     );
     Data.push(address);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
+      "div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium"
     );
     const phoneNumber = await page.$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(15) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
+      "div:nth-child(11) div:nth-child(5) button div div.rogA2c div.Io6YTe.fontBodyMedium",
       (element) => element.textContent.trim()
     );
     Data.push(phoneNumber);
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall"
     );
     await page.click(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
+      "div:nth-child(3) div div button:nth-child(4) div.LRkQ2 div.Gpq6kf.fontTitleSmall",
       { delay: 100 }
     );
 
     await page.waitForSelector(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span"
     );
     const facilities = await page.$$eval(
-      "#QA0Szd div div div.w6VYqd div.bJzME.tTVLSc div div.e07Vkf.kA9KIf div div div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
+      "div.m6QErb.DxyBCb.kA9KIf.dS8AEf div.QoXOEc div div span",
       (elements) => {
         return elements.map((element) => element.innerText);
       }
@@ -145,12 +194,13 @@ async function scrapeHotelDetails(title) {
     Data.push("Amenities:", facilities);
     console.log(Data);
     return Data;
+  } catch (error) {
+    console.log(error);
   } finally {
     if (browser) {
       await browser.close();
     }
   }
-  return Data;
 }
 
 async function stayFunc(title) {
@@ -193,7 +243,7 @@ async function stayFunc(title) {
     console.log(value, "yash");
     stayObj = {
       ...stayObj,
-      hotelDetails: value,
+      "hotelDetails": value,
     };
   });
   console.log("final", stayObj);
