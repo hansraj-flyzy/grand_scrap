@@ -4,33 +4,10 @@ const axios = require("axios");
 var fs = require("fs");
 const app = express();
 
-async function getImageObjectFromUrl(apiUrl) {
-  try {
-    const response = await axios.get(apiUrl);
-    const preview = response.headers.location;
-    const response2 = await axios.get(preview);
-    const type = response2.headers["content-type"];
-    const contentDisposition = response2.headers["content-disposition"];
-    let name = null;
-    if (contentDisposition) {
-      const match = contentDisposition.match(/filename="(.+)"/);
-      if (match) {
-        name = match[1];
-      }
-    }
-    return { preview, type, name };
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
+const XLSX = require("xlsx");
 
 let baseUrl =
   "https://3jmnwr0xu4.execute-api.ap-south-1.amazonaws.com/prod/api";
-
-const title = "taj hotel";
-// const type = "activity";
-const type = "stay";
 
 async function scrapeHotelDetails(title) {
   const browser = await puppeteer.launch({
@@ -92,12 +69,11 @@ async function scrapeHotelDetails(title) {
     );
 
     Data.push(facilities);
-    console.log(Data);
+    // console.log(Data);
   } catch (error) {
     console.log(error);
   }
   try {
-   
     await page.waitForSelector("div.TIHn2 div div.lMbq3e div:nth-child(1) h1");
     const Name = await page.$eval(
       "div.TIHn2 div div.lMbq3e div:nth-child(1) h1",
@@ -143,7 +119,7 @@ async function scrapeHotelDetails(title) {
     );
 
     Data.push("Amenities:", facilities);
-    console.log(Data);
+    // console.log(Data);
   } catch (error) {
     console.log(error);
   }
@@ -192,7 +168,7 @@ async function scrapeHotelDetails(title) {
     );
 
     Data.push("Amenities:", facilities);
-    console.log(Data);
+    // console.log(Data);
     return Data;
   } catch (error) {
     console.log(error);
@@ -200,6 +176,7 @@ async function scrapeHotelDetails(title) {
     if (browser) {
       await browser.close();
     }
+    return Data;
   }
 }
 
@@ -217,9 +194,9 @@ async function stayFunc(title) {
   //   console.log("here", place);
   stayObj = {
     ...stayObj,
-    stay_name: place.name,
-    formatted_address: place.formatted_address,
-    place_id: place.place_id,
+    stay_name: place?.name,
+    formatted_address: place?.formatted_address,
+    place_id: place?.place_id,
   };
   //   console.log("now", stayObj);
   let photoPath = `/public/place/photos/${stayObj.place_id}`;
@@ -233,20 +210,24 @@ async function stayFunc(title) {
     stayImages: arr,
   };
 
-  console.log("stayObj B4 google maps", stayObj);
-  /* GOOGLE MAPS*/
+  // console.log("stayObj B4 google maps", stayObj);
+  /*
+  // /* GOOGLE MAPS*/
 
-  let mapdata = await scrapeHotelDetails(title);
-  // console.log(mapdata);
-  const promise1 = Promise.resolve(mapdata);
-  promise1.then((value) => {
-    console.log(value, "yash");
-    stayObj = {
-      ...stayObj,
-      "hotelDetails": value,
-    };
-  });
-  console.log("final", stayObj);
+  // let mapdata = await scrapeHotelDetails(title);
+  // // console.log(mapdata);
+  // const promise1 = Promise.resolve(mapdata);
+  // promise1.then((value) => {
+  //   console.log(value, "yash");
+  //   stayObj = {
+  //     ...stayObj,
+  //     hotelDetails: value,
+  //   };
+  //   console.log("yash", stayObj);
+  //   return stayObj;
+  // });
+  // */
+  // console.log("final", stayObj);
   return stayObj;
 }
 
@@ -269,27 +250,58 @@ async function activityFunc(title) {
   return actObj;
 }
 
-if (type === "stay") {
-  let stayObj = stayFunc(title);
-  const promise1 = Promise.resolve(stayObj);
+const workbook = XLSX.readFile(
+  "C:/Users/shree balajicomputer/Desktop/intern/grand_scrap/MarketplaceListingsSheet.xlsx"
+);
 
-  promise1.then((value) => {
-    // console.log(value);
-    fs.writeFile("stayFile.json", JSON.stringify(value), (error) => {
-      if (error) throw error;
-    });
-  });
-} else if (type === "activity") {
-  let activityObj = activityFunc(title);
-  const promise1 = Promise.resolve(activityObj);
+const sheetName = workbook.SheetNames[0]; // Assuming you want to read the first sheet
 
-  promise1.then((value) => {
-    // console.log(value);
+// Get the sheet data as an array of objects
+const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    fs.writeFile("activityFile.json", JSON.stringify(value), (error) => {
-      if (error) throw error;
-    });
-  });
+// Iterate through the rows and make API requests
+let hotels = [];
+sheetData.forEach((row) => {
+  let data = row["stay name"]; // Replace 'YourColumnName' with the actual column name containing the request data
+  // console.log(data);
+  hotels.push(data);
+});
+
+// console.log(hotels.length);
+let hotel1 = [];
+let x = 50;
+for (let i = 0; i < x; i++) {
+  hotel1.push(hotels[i]);
 }
+let ans = [];
+hotel1.forEach(async (data) => {
+  const title = data;
+  const type = "stay";
+
+  if (type === "stay") {
+    let stayObj = await stayFunc(title);
+    // console.log(stayObj);
+    ans.push(stayObj);
+    try {
+      console.log("success");
+      fs.writeFile("stayFile.json", JSON.stringify(ans), (error) => {
+        if (error) throw error;
+      });
+    } catch (error) {
+      console.log("err");
+    }
+  } else if (type === "activity") {
+    let activityObj = await activityFunc(title);
+    ans.push(activityObj);
+    try {
+      console.log("success");
+      fs.writeFile("activityFile.json", JSON.stringify(ans), (error) => {
+        if (error) throw error;
+      });
+    } catch (error) {
+      console.log("err");
+    }
+  }
+});
 
 app.listen(8000, () => console.log("app is listening on port 8000."));
