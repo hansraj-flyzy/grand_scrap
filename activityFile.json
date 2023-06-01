@@ -1,1 +1,15 @@
-{"activity_name":"taj hotel","activityImages":["https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Mumbai_Aug_2018_%2843397784544%29.jpg/1200px-Mumbai_Aug_2018_%2843397784544%29.jpg","https://navbharattimes.indiatimes.com/thumb/95857952/facts-about-taj-hotel-mumbai-you-probably-didnt-know-about-95857952.jpg?imgsize=175834&width=1200&height=900&resizemode=75","https://media.npr.org/assets/img/2011/12/23/83940476_wide-b6aca139022b7347a9257805dbc990665c76fe87-s1100-c50.jpg","https://images.hindustantimes.com/rf/image_size_960x540/HT/p2/2018/12/15/Pictures/_9f2b6346-ffd3-11e8-9457-b1b429387a4e.jpg","https://touristtotravellers.com/wp-content/uploads/2021/01/IMG_20210101_153037-1.jpg"]}
+[
+  {
+    "activity_name": "Skiing at Manali",
+    "searchWord": "Skiing at Manali",
+    "activity_description": "Activity Timings: Between 9:00 AM to 04:00 PM.\n\nActivity Duration: 15 Minutes- 20 Minutes\n\nAbout Skiing in Manali:\n\nThe best place to see the effect that snow brings to Manali is to visit the amazing Solang Valley or Solang Nallah. A hotspot for paragliding and zorbing, the valley doubles as a snowy resort in the winters, attracting visitors to try their hands at some Manali skiing. Witness mesmerizing views of Mount Ladakhi, Mount Hanuman Tibba, and Mount Friendship around. Make fun memories with your companions as you enjoy skiing.\n\nHow to reach?\n\nIt is located at about 14 km from Mall Road of Manali and you can reach here by either taking public transport or by hiring a private cab.",
+    "inclusion_description": "Snow Skiing Kit : Dress, Boots and Skis\nSkiing Instructor\n",
+    "state": "Himachal Pradesh",
+    "Location": "Solang Valley",
+    "price": 550,
+    "activityImages": [
+      "https://res.cloudinary.com/thrillophilia/image/upload/c_fill,f_auto,fl_progressive.strip_profile,g_auto,q_auto/v1/filestore/um5fkj39cviuw4lkkubv8io0q68v_1585582939_shutterstock_562441120.jpg",
+      "https://www.tourism-of-india.com/pictures/travel_guide/attractions/thmb/skiing-in-manali-441.jpeg"
+    ]
+  }
+]

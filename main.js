@@ -213,36 +213,22 @@ async function stayFunc(hotel) {
     stayImages: arr,
   };
 
-  // console.log("stayObj B4 google maps", stayObj);
   /*
-  // /* GOOGLE MAPS*/
+  // /* GOOGLE MAPS API*/
 
-  // let mapdata = await scrapeHotelDetails(title);
-  // // console.log(mapdata);
-  // const promise1 = Promise.resolve(mapdata);
-  // promise1.then((value) => {
-  //   console.log(value, "yash");
-  //   stayObj = {
-  //     ...stayObj,
-  //     hotelDetails: value,
-  //   };
-  //   console.log("yash", stayObj);
-  //   return stayObj;
-  // });
-  // */
-  // console.log("final", stayObj);
   return stayObj;
 }
 
-async function activityFunc(title) {
-  console.log("Inside activity func", title);
-  let actObj = {};
-  actObj = {
-    ...actObj,
-    activity_name: title,
+async function activityFunc(activity) {
+  console.log("Inside activity func", activity.activity_name);
+  let actObj = {
+    ...activity,
   };
+
   // console.log("now", actObj);
-  let googleImgURL = `http://localhost:5000/flyzy-web/us-central1/scrape/image/?search_text=${title}&results_length=${5}`;
+  let googleImgURL = `http://localhost:5000/flyzy-web/us-central1/scrape/image/?search_text=${
+    activity.searchWord
+  }&results_length=${2}`;
   let response = await axios.get(googleImgURL);
 
   let photos = response.data.data;
@@ -253,20 +239,20 @@ async function activityFunc(title) {
   return actObj;
 }
 
-const workbook = XLSX.readFile(
-  "C:/Users/shree balajicomputer/Desktop/intern/grand_scrap/MarketplaceListingsSheet.xlsx"
-);
+const workbook = XLSX.readFile("MarketplaceListingsSheet.xlsx");
 
-const sheetName = workbook.SheetNames[0]; // Assuming you want to read the first sheet
+const staySheet = workbook.SheetNames[0]; // Assuming you want to read the first sheet
+const activitySheet = workbook.SheetNames[1];
 
 // Get the sheet data as an array of objects
-const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+const staySheetData = XLSX.utils.sheet_to_json(workbook.Sheets[staySheet]);
+const activitySheetData = XLSX.utils.sheet_to_json(
+  workbook.Sheets[activitySheet]
+);
 
 // Iterate through the rows and make API requests
 let hotels = [];
-sheetData.forEach((row) => {
-  let data = row["stay name"]; // Replace 'YourColumnName' with the actual column name containing the request data
-  // console.log(data);
+staySheetData.forEach((row) => {
   let currObj = {
     title: row["stay name"],
     price: row["Starting Price"],
@@ -277,45 +263,69 @@ sheetData.forEach((row) => {
   };
   hotels.push(currObj);
 });
-let ans = [];
+
+let activities = [];
+activitySheetData.forEach((row) => {
+  let currObj = {
+    activity_name: row["activity name"],
+    searchWord: row["image search keyword"],
+    activity_description: row["activity description"],
+    inclusion_description: row["inclusion description"],
+    state: row["State"],
+    Location: row["location"],
+    price: row["inclusion price"],
+    Remark: row["Remark"],
+  };
+  activities.push(currObj);
+});
+
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+const type = "stay";
 
 async function logHotelNames(hotels) {
+  let ans = [];
   for (const hotel of hotels) {
     await delay(2000);
     // console.log(hotel);
     const title = hotel.title;
-    const type = "stay";
 
-    if (type === "stay") {
-      // console.log(stayObj);
-
-      try {
-        let stayObj = await stayFunc(hotel);
-        ans.push(stayObj);
-        console.log("success");
-        fs.writeFile("stayFile.json", JSON.stringify(ans), (error) => {
-          if (error) throw error;
-        });
-      } catch (error) {
-        console.log("err");
-      }
-    } else if (type === "activity") {
-      let activityObj = await activityFunc(title);
-      ans.push(activityObj);
-      try {
-        console.log("success");
-        fs.writeFile("activityFile.json", JSON.stringify(ans), (error) => {
-          if (error) throw error;
-        });
-      } catch (error) {
-        console.log("err");
-      }
+    try {
+      let stayObj = await stayFunc(hotel);
+      ans.push(stayObj);
+      console.log("success");
+      fs.writeFile("stayFile.json", JSON.stringify(ans), (error) => {
+        if (error) throw error;
+      });
+    } catch (error) {
+      console.log("err");
     }
   }
 }
 
-logHotelNames(hotels);
+async function logActivities(activities) {
+  let ans = [];
+  for (const activity of activities) {
+    await delay(2000);
+
+    try {
+      let activityObj = await activityFunc(activity);
+      ans.push(activityObj);
+      console.log("success");
+      fs.writeFile("activityFile.json", JSON.stringify(ans), (error) => {
+        if (error) throw error;
+      });
+    } catch (error) {
+      console.log("err");
+    }
+  }
+}
+
+if (type === "stay") {
+  logHotelNames(hotels);
+} else if (type === "activity") {
+  logActivities(activities);
+}
+
 app.listen(8000, () => console.log("app is listening on port 8000."));
