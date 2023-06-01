@@ -180,22 +180,25 @@ async function scrapeHotelDetails(title) {
   }
 }
 
-async function stayFunc(title) {
-  console.log("Inside stay func", title);
-  let stayObj = {};
+async function stayFunc(hotel) {
+  console.log("Inside stay func", hotel.title);
+  let stayObj = {
+    ...hotel,
+  };
   let suggestionPath = "/public/get-destinations";
   let url1 = baseUrl + suggestionPath;
   const body = {
-    search_text: title,
+    search_text: hotel.title,
     req_timestamp: new Date().toISOString(),
   };
   let response = await axios.post(url1, body);
   let place = response.data.results[0];
-  //   console.log("here", place);
+  console.log("here", place);
   stayObj = {
     ...stayObj,
-    stay_name: place?.name,
     formatted_address: place?.formatted_address,
+    location: place?.location,
+    stay_name2: place?.name,
     place_id: place?.place_id,
   };
   //   console.log("now", stayObj);
@@ -264,44 +267,55 @@ let hotels = [];
 sheetData.forEach((row) => {
   let data = row["stay name"]; // Replace 'YourColumnName' with the actual column name containing the request data
   // console.log(data);
-  hotels.push(data);
+  let currObj = {
+    title: row["stay name"],
+    price: row["Starting Price"],
+    stay_description: row["stay description"],
+    star: row["Star"],
+    state: row["State"],
+    city: row["City"],
+  };
+  hotels.push(currObj);
 });
-
-// console.log(hotels.length);
-let hotel1 = [];
-let x = 50;
-for (let i = 0; i < x; i++) {
-  hotel1.push(hotels[i]);
-}
 let ans = [];
-hotel1.forEach(async (data) => {
-  const title = data;
-  const type = "stay";
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  if (type === "stay") {
-    let stayObj = await stayFunc(title);
-    // console.log(stayObj);
-    ans.push(stayObj);
-    try {
-      console.log("success");
-      fs.writeFile("stayFile.json", JSON.stringify(ans), (error) => {
-        if (error) throw error;
-      });
-    } catch (error) {
-      console.log("err");
-    }
-  } else if (type === "activity") {
-    let activityObj = await activityFunc(title);
-    ans.push(activityObj);
-    try {
-      console.log("success");
-      fs.writeFile("activityFile.json", JSON.stringify(ans), (error) => {
-        if (error) throw error;
-      });
-    } catch (error) {
-      console.log("err");
+async function logHotelNames(hotels) {
+  for (const hotel of hotels) {
+    await delay(2000);
+    // console.log(hotel);
+    const title = hotel.title;
+    const type = "stay";
+
+    if (type === "stay") {
+      // console.log(stayObj);
+
+      try {
+        let stayObj = await stayFunc(hotel);
+        ans.push(stayObj);
+        console.log("success");
+        fs.writeFile("stayFile.json", JSON.stringify(ans), (error) => {
+          if (error) throw error;
+        });
+      } catch (error) {
+        console.log("err");
+      }
+    } else if (type === "activity") {
+      let activityObj = await activityFunc(title);
+      ans.push(activityObj);
+      try {
+        console.log("success");
+        fs.writeFile("activityFile.json", JSON.stringify(ans), (error) => {
+          if (error) throw error;
+        });
+      } catch (error) {
+        console.log("err");
+      }
     }
   }
-});
+}
 
+logHotelNames(hotels);
 app.listen(8000, () => console.log("app is listening on port 8000."));
