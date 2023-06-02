@@ -43,14 +43,14 @@ async function getImageObjectFromUrl(apiUrl) {
   }
 }
 
-async function scrapeHotelDetails() {
+async function scrapeHotelDetails(title) {
   const browser = await puppeteer.launch({
     headless: false,
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
   let Data = {};
-  const hotelName = "Hotel Green View, Jammu";
+  const hotelName = title;
   const searchQuery = `https://www.google.com/maps/search/${encodeURIComponent(
     hotelName
   )}`;
@@ -425,7 +425,7 @@ async function stayFunc(hotel) {
   // /* GOOGLE MAPS API*/
 
   try {
-    let mapData = await scrapeHotelDetails();
+    let mapData = await scrapeHotelDetails(hotel.title);
     stayObj = { ...stayObj, mapData: mapData };
     console.log("map k bd", stayObj);
   } catch (error) {
