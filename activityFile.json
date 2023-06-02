@@ -1,15 +1,13 @@
 [
   {
-    "activity_name": "Skiing at Manali",
-    "searchWord": "Skiing at Manali",
-    "activity_description": "Activity Timings: Between 9:00 AM to 04:00 PM.\n\nActivity Duration: 15 Minutes- 20 Minutes\n\nAbout Skiing in Manali:\n\nThe best place to see the effect that snow brings to Manali is to visit the amazing Solang Valley or Solang Nallah. A hotspot for paragliding and zorbing, the valley doubles as a snowy resort in the winters, attracting visitors to try their hands at some Manali skiing. Witness mesmerizing views of Mount Ladakhi, Mount Hanuman Tibba, and Mount Friendship around. Make fun memories with your companions as you enjoy skiing.\n\nHow to reach?\n\nIt is located at about 14 km from Mall Road of Manali and you can reach here by either taking public transport or by hiring a private cab.",
-    "inclusion_description": "Snow Skiing Kit : Dress, Boots and Skis\nSkiing Instructor\n",
-    "state": "Himachal Pradesh",
-    "Location": "Solang Valley",
-    "price": 550,
+    "activity_name": "Shikara Ride in Dal Lake",
+    "package_name": 500,
+    "activity_description": "A Shikhara is a traditional Gondola type light rowing boat which is mostly seen on the pristine Dal Lake, apart from other lakes. It is one of the most incredible and relaxing aspects of a holiday in Kashmir, and should be included in your itinerary if you want to experience the surreal beauty of this region to the fullest. Along with the houseboats, it is also considered to be a cultural symbol. But even apart from leisure and tourism purposes, the shikhara is also used by the locals for seaweed harvesting, fishing and transportation. To watch these beautifully decorated boats glide serenely on the lake is a treat to the eyes, and you should definitely not miss out on this experience during your holidays in Jammu and Kashmir.",
+    "state": "Jammu and Kashmir",
+    "Location": "Dal Lake",
     "activityImages": [
-      "https://res.cloudinary.com/thrillophilia/image/upload/c_fill,f_auto,fl_progressive.strip_profile,g_auto,q_auto/v1/filestore/um5fkj39cviuw4lkkubv8io0q68v_1585582939_shutterstock_562441120.jpg",
-      "https://www.tourism-of-india.com/pictures/travel_guide/attractions/thmb/skiing-in-manali-441.jpeg"
+      "https://study.com/cimages/videopreview/screenshot-100_99609.jpg",
+      "https://study.com/cimages/multimages/16/0g4tvzn.png"
     ]
   }
 ]
