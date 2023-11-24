@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model images {
+  id              Int              @id(map: "images_pk")
+  url             String           @db.VarChar
+  label           String?          @db.VarChar
+  hotelId         String?          @db.VarChar
+  roomId          Int?
+  amenityId       Int?
+  hotel_amenities hotel_amenities? @relation(fields: [amenityId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "images_hotel-amenities_id_fk")
+  hotel_rooms     hotel_rooms?     @relation(fields: [roomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "images_hotel-rooms_id_fk")
+  hotels          hotels?          @relation(fields: [hotelId], references: [hotelId], onDelete: NoAction, onUpdate: NoAction, map: "images_hotels_hotelId_fk")
+}
+
+model hotel_amenities {
+  id          Int         @id(map: "hotel-amenities_pk")
+  name        String      @db.VarChar
+  hotelId     String?     @db.VarChar
+  roomId      Int
+  hotel_rooms hotel_rooms @relation(fields: [roomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hotel-amenities_hotel-rooms_id_fk")
+  hotels      hotels?     @relation(fields: [hotelId], references: [hotelId], onDelete: NoAction, onUpdate: NoAction, map: "hotel-amenities_hotels_hotelId_fk")
+  images      images[]
+
+  @@map("hotel-amenities")
+}
+
+model hotel_place_mappings {
+  contextId          String             @db.VarChar
+  hotelId            String             @db.VarChar
+  contextType        String             @db.VarChar
+  hotels             hotels             @relation(fields: [hotelId], references: [hotelId], onDelete: NoAction, onUpdate: NoAction, map: "hotel-place-mappings_hotels_hotelId_fk")
+  places_autosuggest places_autosuggest @relation(fields: [contextId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hotel-place-mappings_places-autosuggest_id_fk")
+
+  @@id([hotelId, contextId], map: "hotel-place-mappings_pk")
+  @@map("hotel-place-mappings")
+}
+
+model hotel_room_prices {
+  id          Int
+  name        String      @db.VarChar
+  unit_price  Int
+  currency    String      @db.VarChar
+  description String?     @db.VarChar
+  startDate   DateTime    @db.Date
+  endDate     DateTime    @db.Date
+  roomId      Int
+  hotel_rooms hotel_rooms @relation(fields: [roomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hotel-room-prices_hotel-rooms_id_fk")
+
+  @@id([startDate, roomId, currency, endDate], map: "hotel-room-prices_pk")
+  @@map("hotel-room-prices")
+}
+
+model hotel_rooms {
+  id                Int                 @id(map: "hotel-rooms_pk")
+  name              String              @db.VarChar
+  description       String?             @db.VarChar
+  hotelId           String              @db.VarChar
+  hotel_amenities   hotel_amenities[]
+  hotel_room_prices hotel_room_prices[]
+  hotels            hotels              @relation(fields: [hotelId], references: [hotelId], onDelete: NoAction, onUpdate: NoAction, map: "hotel-rooms_hotels_hotelId_fk")
+  images            images[]
+
+  @@map("hotel-rooms")
+}
+
+model hotels {
+  hotelId              String                 @id(map: "hotels_pk") @db.VarChar
+  name                 String                 @db.VarChar
+  stars                Int?
+  address              String?                @db.VarChar
+  description          String?                @db.VarChar
+  source               String                 @db.VarChar
+  latlng               Json?
+  mmt_url              String?                @map("mmt-url") @db.VarChar
+  visited              Boolean?
+  scraped_full         Boolean?
+  error                Boolean?
+  error_message        String?                @db.VarChar
+  hotel_amenities      hotel_amenities[]
+  hotel_place_mappings hotel_place_mappings[]
+  hotel_rooms          hotel_rooms[]
+  images               images[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model places_autosuggest {
+  id                      String                 @id(map: "places-autosuggest_pk") @db.VarChar
+  displayName             String                 @db.VarChar
+  countryName             String                 @db.VarChar
+  countryCode             String                 @db.VarChar
+  type                    String                 @db.VarChar
+  htlCount                Int?
+  context                 Json
+  contextId               Json
+  maxAltAccoPropertyCount Int?
+  maxAltAccoPropertyType  String?                @db.VarChar
+  altAccoCount            Int?
+  htype                   String?                @db.VarChar
+  name                    String?                @db.VarChar
+  subType_                String?                @map("subType ") @db.VarChar
+  searchRegion            String?                @db.VarChar
+  cityCode                String?                @db.VarChar
+  cityName                String?                @db.VarChar
+  centre                  Json?
+  gid                     String?                @db.VarChar
+  isHub                   Boolean?
+  ne                      Json?
+  propertyCount           Json?
+  stateCode               String?                @db.VarChar
+  stateName               String?                @db.VarChar
+  subtext                 String?                @db.VarChar
+  sw                      Json?
+  nonAltAccoCount         Int?
+  locType                 String?                @db.VarChar
+  hotel_place_mappings    hotel_place_mappings[]
+
+  @@map("places-autosuggest")
+}
